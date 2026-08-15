@@ -1,0 +1,15 @@
+prometheus:
+  scrapeAnnotations: true
+  namespace: monitoring
+  serviceAccount: prometheus-kube-prometheus-prometheus
+  serviceMonitor:
+    enabled: true
+    additionalLabels:
+      release: prometheus
+
+frr-k8s:
+  prometheus:
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus

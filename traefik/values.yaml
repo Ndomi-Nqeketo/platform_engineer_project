@@ -8,7 +8,7 @@ providers:
   kubernetesCRD:
     enabled: true
   kubernetesIngress:
-    enabled: true
+    enabled: false
   kubernetesGateway:
     experimentalChannel: false
     enabled: true
@@ -44,3 +44,7 @@ metrics:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8082"
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: prometheus

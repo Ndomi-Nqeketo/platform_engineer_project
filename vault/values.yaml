@@ -1,0 +1,14 @@
+server:
+  dev:
+    enabled: true
+    devRootToken: root
+  dataStorage:
+    enabled: false
+  standalone:
+    enabled: false
+
+injector:
+  enabled: false
+
+ui:
+  enabled: true
