@@ -4,7 +4,7 @@ server:
   dataStorage:
     enabled: true
     size: 10Gi
-    storageClass: openebs-hostpath
+    storageClass: local-path
   standalone:
     enabled: true
     config: |
