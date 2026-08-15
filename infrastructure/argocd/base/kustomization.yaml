@@ -11,6 +11,7 @@ resources:
   - httproute.yaml
   - prometheus-application.yaml
   - platform-application.yaml
+  - argocd-servicemonitor.yaml
 
 patches:
   - target:
