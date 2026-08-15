@@ -15,6 +15,7 @@ This project demonstrates a local platform engineering stack built on Kubernetes
    - `argocd/argocd-tls`
    - `vault/vault-tls`
    - `monitoring/prometheus-tls`
+   - `monitoring/grafana-tls`
 - External Secrets authenticates to Vault with Kubernetes service accounts, not the Vault root token.
 
 This setup is for local development. Vault uses a persistent single-node Raft volume and must not be exposed directly to the public internet.
@@ -79,17 +80,14 @@ kubectl -n vault get pods,svc
 Vault's in-cluster API address is `http://vault.vault.svc.cluster.local:8200`. The Gateway address is `https://vault.ndomi.local`.
 The Helm values use a single-node Raft backend backed by a 10Gi PVC.
 
-The PVC uses the `openebs-hostpath` StorageClass, which is installed and
-managed by Argo CD through `infrastructure/argocd/base/openebs`.
-
 The current Vault PVC uses the `local-path` StorageClass. Its provisioner is
 managed by the Argo CD Application in `infrastructure/argocd/base/local-path`.
 
 Install the storage provisioner before upgrading Vault:
 
 ```bash
-argocd app sync openebs
-kubectl get storageclass openebs-hostpath
+argocd app sync local-path
+kubectl get storageclass local-path
 helm upgrade vault hashicorp/vault \
    --namespace vault \
    -f vault/values.yaml
@@ -107,6 +105,11 @@ bash vault/bootstrap.sh
 The script creates `vault-init.json` locally on first initialization. It
 contains the unseal key and root token; protect it and remove it from the
 working directory after securely storing the recovery information.
+
+If Vault is recreated, do not wait for the readiness condition before running
+bootstrap: an uninitialized Vault is Running but not Ready. The bootstrap
+script waits for pod phase `Running`, initializes/unseals Vault, enables KV v2,
+and configures Kubernetes auth.
 
 ## Certificate Storage
 
@@ -163,6 +166,7 @@ Verify:
 kubectl -n argocd get externalsecret,secret argocd-tls
 kubectl -n vault get externalsecret,secret vault-tls
 kubectl -n monitoring get externalsecret,secret prometheus-tls
+kubectl -n monitoring get externalsecret,secret grafana-tls
 ```
 
 ## Hostnames and TLS Tests
@@ -183,6 +187,27 @@ curl -k --resolve vault.ndomi.local:443:192.168.1.240 \
 ```
 
 The `-k` flag is only needed when the local `mkcert` CA is not trusted by the client.
+
+## Grafana
+
+Grafana is a standalone Argo CD Helm Application. Its data is persistent on
+the `local-path` StorageClass, and the Grafana datasource uses the internal
+Prometheus Service rather than the external hostname:
+
+```text
+http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+```
+
+The admin password can be reset inside the running pod:
+
+```bash
+kubectl -n monitoring exec deploy/grafana -- \
+   grafana cli admin reset-admin-password 'NewStrongPassword'
+```
+
+If Grafana remains unready, inspect the `init-chown-data` container. The local
+path configuration disables that init container because it cannot chown the
+mounted volume under this cluster's security policy.
 
 ## Prometheus Metrics
 
