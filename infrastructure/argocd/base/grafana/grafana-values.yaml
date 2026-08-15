@@ -15,6 +15,16 @@ grafana.ini:
     domain: grafana.ndomi.local
     root_url: https://grafana.ndomi.local
 
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+        isDefault: true
+
 sidecar:
   dashboards:
     enabled: true
