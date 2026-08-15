@@ -5,7 +5,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://openebs.github.io/openebs
+    - repoURL: https://openebs.github.io/dynamic-localpv-provisioner
       chart: localpv-provisioner
       targetRevision: 4.2.0
       helm:
