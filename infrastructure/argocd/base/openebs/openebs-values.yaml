@@ -1,17 +1,6 @@
-engines:
-  local:
-    lvm:
-      enabled: false
-    zfs:
-      enabled: false
-  replicated:
-    mayastor:
-      enabled: false
-
-localpv-provisioner:
+hostpathClass:
   enabled: true
-  hostpathClass:
-    enabled: true
-    name: openebs-hostpath
-  deviceClass:
-    enabled: false
+  name: openebs-hostpath
+
+deviceClass:
+  enabled: false
