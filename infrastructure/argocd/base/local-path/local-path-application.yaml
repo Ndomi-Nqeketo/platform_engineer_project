@@ -5,15 +5,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://charts.rancher.io
-    chart: local-path-provisioner
-    targetRevision: 0.0.31
-    helm:
-      releaseName: local-path
-      values: |
-        storageClass:
-          name: local-path
-          defaultClass: false
+    repoURL: https://github.com/rancher/local-path-provisioner.git
+    path: deploy
+    targetRevision: master
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
