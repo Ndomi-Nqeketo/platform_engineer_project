@@ -17,7 +17,7 @@ This project demonstrates a local platform engineering stack built on Kubernetes
    - `monitoring/prometheus-tls`
 - External Secrets authenticates to Vault with Kubernetes service accounts, not the Vault root token.
 
-This setup is for local development. Vault currently runs in development mode with ephemeral storage and must not be exposed directly to the public internet.
+This setup is for local development. Vault uses a persistent single-node Raft volume and must not be exposed directly to the public internet.
 
 ## MetalLB
 
@@ -64,7 +64,7 @@ Argo CD is exposed through the Gateway API resources in `infrastructure/argocd/b
 
 ## Vault
 
-Install the local development Vault:
+Install Vault with persistent storage:
 
 ```bash
 helm repo add hashicorp https://helm.releases.hashicorp.com
@@ -77,19 +77,40 @@ kubectl -n vault get pods,svc
 ```
 
 Vault's in-cluster API address is `http://vault.vault.svc.cluster.local:8200`. The Gateway address is `https://vault.ndomi.local`.
+The Helm values use a single-node Raft backend backed by a 10Gi PVC.
+
+The PVC uses the `openebs-hostpath` StorageClass, which is installed and
+managed by Argo CD through `infrastructure/argocd/base/openebs`.
+
+Install the storage provisioner before upgrading Vault:
+
+```bash
+argocd app sync openebs
+kubectl get storageclass openebs-hostpath
+helm upgrade vault hashicorp/vault \
+   --namespace vault \
+   -f vault/values.yaml
+```
+
+After the StatefulSet is ready, run the bootstrap script. It initializes and
+unseals Vault on first provisioning, or reuses an existing initialized Vault:
+
+```bash
+export CERT_FILE=/path/to/cert.pem
+export KEY_FILE=/path/to/key.pem
+bash vault/bootstrap.sh
+```
+
+The script creates `vault-init.json` locally on first initialization. It
+contains the unseal key and root token; protect it and remove it from the
+working directory after securely storing the recovery information.
 
 ## Certificate Storage
 
-The local certificate and private key are intentionally not stored in this repository. Store an existing wildcard certificate in Vault through the Gateway:
+The local certificate and private key are intentionally not stored in this repository. The bootstrap script stores an existing wildcard certificate in Vault at:
 
 ```bash
-export VAULT_ADDR=https://vault.ndomi.local
-export VAULT_TOKEN=root
-export VAULT_SKIP_VERIFY=true
-
-vault kv put secret/ndomi-local-wildcard \
-   tls.crt=@/path/to/cert.pem \
-   tls.key=@/path/to/key.pem
+secret/ndomi-local-wildcard
 ```
 
 The certificate should cover `*.ndomi.local`, including `argocd.ndomi.local` and `vault.ndomi.local`.
@@ -113,32 +134,16 @@ Apply the Vault Gateway and synchronization resources:
 kubectl apply -k vault
 ```
 
-The resources in `vault/argocd-secret-sync.yaml` create dedicated `vault-auth` service accounts and configure Kubernetes authentication. Vault must be bootstrapped once with the root token:
+The resources in `vault/argocd-secret-sync.yaml` create dedicated `vault-auth`
+service accounts. `vault/bootstrap.sh` configures Kubernetes authentication,
+the read-only policy, and the `external-secrets` role before applying these
+resources.
 
-```bash
-export VAULT_ADDR=https://vault.ndomi.local
-export VAULT_TOKEN=root
-export VAULT_SKIP_VERIFY=true
-
-vault auth enable kubernetes
-REVIEWER_JWT="$(kubectl -n vault create token vault)"
-kubectl -n vault get configmap kube-root-ca.crt \
-   -o jsonpath='{.data.ca\.crt}' > /tmp/kube-ca.crt
-vault write auth/kubernetes/config \
-   token_reviewer_jwt="$REVIEWER_JWT" \
-   kubernetes_host="https://kubernetes.default.svc:443" \
-   kubernetes_ca_cert=@/tmp/kube-ca.crt
-vault policy write external-secrets - <<'EOF'
-path "secret/data/ndomi-local-wildcard" {
-   capabilities = ["read"]
-}
-EOF
-vault write auth/kubernetes/role/external-secrets \
-   bound_service_account_names=vault-auth \
-   bound_service_account_namespaces=argocd,vault,monitoring \
-   policies=external-secrets \
-   ttl=1h
-```
+The bootstrap script also applies `infrastructure/monitoring`, so the
+Prometheus and Grafana TLS Secrets are recreated from the same Vault value.
+Deleting the Vault PVC intentionally destroys the Vault state and requires
+initialization again; uninstalling and reinstalling the Helm release alone
+does not delete the PVC.
 
 Force synchronization after changing the Vault value or authentication:
 
