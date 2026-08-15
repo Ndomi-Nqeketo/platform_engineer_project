@@ -9,11 +9,12 @@ This project demonstrates a local platform engineering stack built on Kubernetes
 - Argo CD is available at `https://argocd.ndomi.local`.
 - Vault is available at `https://vault.ndomi.local`.
 - Prometheus is available at `https://prometheus.ndomi.local`.
-- Both applications share the Traefik IP and are routed by hostname.
+- Argo CD, Vault, and Prometheus share the Traefik IP and are routed by hostname.
 - Vault stores the wildcard certificate at `secret/ndomi-local-wildcard`.
 - External Secrets Operator synchronizes that certificate into namespace-local Secrets:
    - `argocd/argocd-tls`
    - `vault/vault-tls`
+   - `monitoring/prometheus-tls`
 - External Secrets authenticates to Vault with Kubernetes service accounts, not the Vault root token.
 
 This setup is for local development. Vault currently runs in development mode with ephemeral storage and must not be exposed directly to the public internet.
@@ -134,7 +135,7 @@ path "secret/data/ndomi-local-wildcard" {
 EOF
 vault write auth/kubernetes/role/external-secrets \
    bound_service_account_names=vault-auth \
-   bound_service_account_namespaces=argocd,vault \
+   bound_service_account_namespaces=argocd,vault,monitoring \
    policies=external-secrets \
    ttl=1h
 ```
@@ -153,6 +154,7 @@ Verify:
 ```bash
 kubectl -n argocd get externalsecret,secret argocd-tls
 kubectl -n vault get externalsecret,secret vault-tls
+kubectl -n monitoring get externalsecret,secret prometheus-tls
 ```
 
 ## Hostnames and TLS Tests
@@ -160,7 +162,7 @@ kubectl -n vault get externalsecret,secret vault-tls
 Add the Gateway IP to `/etc/hosts`:
 
 ```text
-192.168.1.240 argocd.ndomi.local vault.ndomi.local
+192.168.1.240 argocd.ndomi.local vault.ndomi.local prometheus.ndomi.local
 ```
 
 Test both routes:
@@ -181,6 +183,7 @@ Metrics are enabled for the platform components:
 - Traefik exposes Prometheus metrics and creates a ServiceMonitor through `traefik/values.yaml`.
 - MetalLB and bundled FRR-K8s expose metrics and create ServiceMonitors through `metallb/values.yaml`.
 - Argo CD metrics Services receive Prometheus scrape annotations through the Argo CD Kustomization.
+- Talos-incompatible control-plane, kube-proxy, and node-exporter monitors are disabled in the Argo-managed chart values.
 
 These settings configure scrape targets. Prometheus is managed by Argo CD through `infrastructure/argocd/base/prometheus-application.yaml`.
 
@@ -230,6 +233,33 @@ kubectl apply -k monitoring
 The monitoring Kustomization creates a namespace-local TLS Secret from Vault
 and routes `prometheus.ndomi.local` to
 `prometheus-kube-prometheus-prometheus:9090`.
+
+## GitOps with Argo CD
+
+The platform Application monitors the GitHub repository and synchronizes the
+development overlay:
+
+```text
+Repository: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+Branch: masters
+Path: infrastructure/argocd/overlays/dev
+```
+
+It is defined in `infrastructure/argocd/base/platform-application.yaml` with
+automated pruning, self-healing, and server-side apply. The repository must
+contain the configured path before Argo CD can generate manifests.
+
+Apply or inspect it with:
+
+```bash
+kubectl apply --server-side \
+   -k infrastructure/argocd/overlays/dev
+argocd app get platform-engineer-project
+argocd app sync platform-engineer-project
+```
+
+Do not combine Argo CD `Force=true` with `ServerSideApply=true`; Kubernetes
+rejects that combination.
 
 ## Vault Human Login
 
