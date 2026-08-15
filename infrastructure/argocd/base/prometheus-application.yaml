@@ -21,12 +21,10 @@ spec:
         prometheus:
           prometheusSpec:
             serviceMonitorSelector:
-              matchLabels:
-                release: prometheus
+              {}
             serviceMonitorNamespaceSelector: {}
             podMonitorSelector:
-              matchLabels:
-                release: prometheus
+              {}
             podMonitorNamespaceSelector: {}
   destination:
     server: https://kubernetes.default.svc
