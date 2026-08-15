@@ -5,6 +5,8 @@ metadata:
 spec:
   parentRefs:
     - name: argocd-gateway
+      group: gateway.networking.k8s.io
+      kind: Gateway
       sectionName: websecure
   hostnames:
     - argocd.ndomi.local
@@ -14,5 +16,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: argocd-server
+        - group: ""
+          kind: Service
+          name: argocd-server
           port: 80
+          weight: 1
