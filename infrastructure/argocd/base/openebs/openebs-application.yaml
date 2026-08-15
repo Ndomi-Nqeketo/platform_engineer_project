@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs
+spec:
+  project: default
+  source:
+    repoURL: https://openebs.github.io/openebs
+    chart: openebs
+    targetRevision: 4.2.0
+    helm:
+      releaseName: openebs
+      values: |
+        localpv-provisioner:
+          enabled: true
+        lvm-localpv:
+          enabled: false
+        zfs-localpv:
+          enabled: false
+        mayastor:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openebs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
