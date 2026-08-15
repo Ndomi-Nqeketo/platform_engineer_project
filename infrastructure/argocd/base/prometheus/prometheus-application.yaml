@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus
+spec:
+  project: default
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 77.5.0
+      helm:
+        releaseName: prometheus
+        valueFiles:
+          - $values/infrastructure/argocd/base/prometheus/prometheus-values.yaml
+    - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+      targetRevision: masters
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

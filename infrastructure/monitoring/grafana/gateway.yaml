@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: prometheus-gateway
+  name: grafana-gateway
   namespace: monitoring
 spec:
   gatewayClassName: traefik
@@ -9,11 +9,12 @@ spec:
     - name: websecure
       protocol: HTTPS
       port: 443
-      hostname: prometheus.ndomi.local
+      hostname: grafana.ndomi.local
       tls:
         mode: Terminate
         certificateRefs:
-          - name: prometheus-tls
+          - name: grafana-tls
+            group: ""
             kind: Secret
       allowedRoutes:
         namespaces:
