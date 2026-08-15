@@ -6,7 +6,7 @@ spec:
   project: default
   sources:
     - repoURL: https://openebs.github.io/openebs
-      chart: openebs
+      chart: localpv-provisioner
       targetRevision: 4.2.0
       helm:
         releaseName: openebs
