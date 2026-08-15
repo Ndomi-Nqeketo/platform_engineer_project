@@ -1,0 +1,22 @@
+service:
+  type: ClusterIP
+  port: 80
+
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus
+
+persistence:
+  enabled: false
+
+grafana.ini:
+  server:
+    domain: grafana.ndomi.local
+    root_url: https://grafana.ndomi.local
+
+sidecar:
+  dashboards:
+    enabled: true
+  datasources:
+    enabled: true

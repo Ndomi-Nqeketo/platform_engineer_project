@@ -4,14 +4,10 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  - namespace.yaml
-  - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-  - gatewayclass.yaml
-  - gateway.yaml
-  - httproute.yaml
-  - prometheus-application.yaml
-  - platform-application.yaml
-  - argocd-servicemonitor.yaml
+  - argocd
+  - prometheus
+  - grafana
+  - platform
 
 patches:
   - target:

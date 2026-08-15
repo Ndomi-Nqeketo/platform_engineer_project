@@ -1,26 +1,19 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: argocd-gateway
+  name: prometheus-gateway
+  namespace: monitoring
 spec:
   gatewayClassName: traefik
   listeners:
-    - name: web
-      protocol: HTTP
-      port: 80
-      hostname: argocd.ndomi.local
-      allowedRoutes:
-        namespaces:
-          from: Same
-          
     - name: websecure
       protocol: HTTPS
       port: 443
-      hostname: argocd.ndomi.local
+      hostname: prometheus.ndomi.local
       tls:
         mode: Terminate
         certificateRefs:
-          - name: argocd-tls
+          - name: prometheus-tls
             group: ""
             kind: Secret
       allowedRoutes:
