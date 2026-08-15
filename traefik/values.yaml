@@ -1,0 +1,46 @@
+deployment:
+  replicas: 2
+  
+service:
+  type: LoadBalancer
+  
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
+  kubernetesGateway:
+    experimentalChannel: false
+    enabled: true
+    
+ingressClass:
+    enabled: true
+    isDefaultClass: true
+    
+accessLog:
+  enabled: true
+  fields:
+    names:
+      RouterName: drop
+        
+gateway:
+  enabled: false
+  
+gatewayClass:
+  enabled: false
+  
+ports:
+  web:
+    port: 80
+    exposedPort: 80
+  websecure:
+    port: 443
+    exposedPort: 443
+    
+metrics:
+  prometheus:
+    service:
+      enabled: true
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
