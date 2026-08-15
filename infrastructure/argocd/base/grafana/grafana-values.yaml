@@ -8,7 +8,12 @@ serviceMonitor:
     release: prometheus
 
 persistence:
-  enabled: false
+  enabled: true
+  type: pvc
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
 
 grafana.ini:
   server:
