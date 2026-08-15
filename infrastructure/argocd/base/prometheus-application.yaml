@@ -18,6 +18,8 @@ spec:
           enabled: false
         kubeProxy:
           enabled: false
+        nodeExporter:
+          enabled: false
         prometheus:
           prometheusSpec:
             serviceMonitorSelector:
