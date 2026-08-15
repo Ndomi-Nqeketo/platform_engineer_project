@@ -82,6 +82,9 @@ The Helm values use a single-node Raft backend backed by a 10Gi PVC.
 The PVC uses the `openebs-hostpath` StorageClass, which is installed and
 managed by Argo CD through `infrastructure/argocd/base/openebs`.
 
+The current Vault PVC uses the `local-path` StorageClass. Its provisioner is
+managed by the Argo CD Application in `infrastructure/argocd/base/local-path`.
+
 Install the storage provisioner before upgrading Vault:
 
 ```bash
