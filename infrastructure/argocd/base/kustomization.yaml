@@ -10,6 +10,7 @@ resources:
   - openebs
   - local-path
   - platform
+  - vault
 
 patches:
   - target:
