@@ -4,8 +4,9 @@ metadata:
     name: vault
     namespace: argocd
 spec:
-  sources:
-    repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project
+  project: default
+  source:
+    repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
     targetRevision: masters
     path: infrastructure/argocd/base/vault
   destination:
