@@ -19,9 +19,9 @@ initChownData:
   enabled: false
   
 admin:
-    existingSecret: grafana-admin
-    userKey: admin-user
-    passwordKey: admin-password
+  existingSecret: grafana-admin
+  userKey: admin-user
+  passwordKey: admin-password
 
 grafana.ini:
   server:
