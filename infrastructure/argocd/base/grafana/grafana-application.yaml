@@ -12,7 +12,7 @@ spec:
         releaseName: grafana
         valueFiles:
           - $values/infrastructure/argocd/base/grafana/grafana-values.yaml
-          -
+
     - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
       targetRevision: masters
       ref: values
