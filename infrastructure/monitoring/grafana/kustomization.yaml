@@ -5,3 +5,4 @@ resources:
   - gateway.yaml
   - httproute.yaml
   - tls-sync.yaml
+  - external-secret.yaml
