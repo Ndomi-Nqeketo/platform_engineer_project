@@ -19,3 +19,10 @@ prometheus:
     serviceMonitorNamespaceSelector: {}
     podMonitorSelector: {}
     podMonitorNamespaceSelector: {}
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 500m
+      limits:
+        memory: "2Gi"
+        cpu: "2"
