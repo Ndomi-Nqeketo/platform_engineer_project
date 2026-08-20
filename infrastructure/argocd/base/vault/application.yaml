@@ -6,9 +6,21 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
-    targetRevision: masters
-    path: infrastructure/argocd/base/vault
+    - repoURL: https://helm.releases.hashicorp.com
+      chart: vault
+      targetRevision: 2.0.4
+      helm:
+        releaseName: vault
+        valueFiles:
+          - $values/vault/values.yaml
+          
+    - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+      targetRevision: masters
+      ref: values
+  
+    - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+      targetRevision: masters
+      path: infrastructure/argocd/base/vault
   destination:
     server: https://kubernetes.default.svc
     namespace: vault
