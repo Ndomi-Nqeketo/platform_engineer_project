@@ -79,5 +79,5 @@ patches:
       metadata:
         name: applicationsets.argoproj.io
         annotations:
-          argocd.argoproj.io/sync-options: ServerSideApply=false
+          argocd.argoproj.io/sync-options: Replace=true
           
