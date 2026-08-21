@@ -8,3 +8,4 @@ resources:
   - frontend-service.yaml
   - gateway.yaml
   - httproute.yaml
+  - tls-sync.yaml
