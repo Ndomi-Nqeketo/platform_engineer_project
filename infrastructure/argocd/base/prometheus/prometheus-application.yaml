@@ -10,6 +10,7 @@ spec:
       targetRevision: 88.3.0
       helm:
         releaseName: prometheus
+        skipCrds: true
         valueFiles:
           - $values/infrastructure/argocd/base/prometheus/prometheus-values.yaml
     - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git

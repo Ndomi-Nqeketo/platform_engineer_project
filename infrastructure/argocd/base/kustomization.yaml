@@ -11,6 +11,7 @@ resources:
   - local-path
   - platform
   - vault/application.yaml
+  - prometheus-crds
 
 patches:
   - target:
