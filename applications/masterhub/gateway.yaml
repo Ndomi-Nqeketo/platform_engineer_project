@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: masterhub-gateway
+  namespace: masterhub
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: websecure
+      protocol: HTTPS
+      port: 443
+      hostname: masterhub.ndomi.local
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: masterhub-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
