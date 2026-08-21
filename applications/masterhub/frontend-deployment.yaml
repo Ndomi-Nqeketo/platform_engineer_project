@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ndomi/mastershub-frontend:v1.0.1
+          image: ndomi/mastershub-frontend:v1.0.2
           imagePullPolicy: Always
           ports:
             - name: http
