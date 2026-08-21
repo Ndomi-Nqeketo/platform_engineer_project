@@ -1,0 +1,36 @@
+image:
+  repository: ghcr.io/quenchworks/images/distribution
+  digest: "sha256:d36575774b4742443ac5c4296b443f4b394caaf4340070d8fae6ca1378321de3"
+  pullPolicy: IfNotPresent
+  
+replicaCount: 1
+
+persistence:
+  enabled: true
+  storageClass: "local-path"
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: "1"
+    
+service:
+  type: ClusterIP
+  port: 5000
+  
+networkPolicy:
+  enabled: false
+  allowExternal: true
+  
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+  
+ingress:
+  enabled: false
