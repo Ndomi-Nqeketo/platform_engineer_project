@@ -9,3 +9,4 @@ resources:
   - gateway.yaml
   - httproute.yaml
   - tls-sync.yaml
+  - secret-store.yaml
