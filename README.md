@@ -54,9 +54,64 @@ but should be reviewed and adapted before use.
 infrastructure/argocd/base/       Argo CD Applications and base resources
 infrastructure/argocd/overlays/  Environment-specific Argo CD entry points
 infrastructure/monitoring/       Prometheus and Grafana Gateway resources
+applications/masterhub/          MasterHub frontend, backend, Gateway, and Vault sync resources
 metallb/                          MetalLB chart values and address pool
 traefik/                          Traefik chart values
 vault/                            Vault chart values, bootstrap, and sync resources
+```
+
+## Application Deployment
+
+The MasterHub application is deployed from `applications/masterhub` into the
+`masterhub` namespace. It contains:
+
+- `masterhub-frontend`: two replicas using `ndomi/mastershub-frontend:v1.0.5`,
+  served internally on port 80.
+- `masterhub-backend`: two replicas using `ndomi/mastershub-backend:v1.0.1`,
+  served internally on port 8080.
+- A Traefik Gateway and HTTPRoute for `masterhub.ndomi.local`.
+- A Vault-backed `masterhub-tls` Secret managed by External Secrets Operator.
+
+Deploy the application after Vault, External Secrets Operator, and the Traefik
+GatewayClass are available:
+
+```bash
+kubectl create namespace masterhub --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -k applications/masterhub
+```
+
+The application Gateway terminates HTTPS with `masterhub-tls` and routes `/` to
+the frontend Service. The backend Service is cluster-internal and is not exposed
+directly through the Gateway.
+
+Before applying the manifests, ensure Vault's `external-secrets` Kubernetes auth
+role allows the `masterhub` namespace. The bootstrap script configures that role
+for `argocd`, `vault`, and `monitoring`; add `masterhub` to the role's
+`bound_service_account_namespaces` when deploying this application.
+
+Verify the rollout and generated TLS Secret:
+
+```bash
+kubectl -n masterhub get deploy,pods,svc
+kubectl -n masterhub rollout status deployment/masterhub-frontend
+kubectl -n masterhub rollout status deployment/masterhub-backend
+kubectl -n masterhub get externalsecret,secret
+kubectl -n masterhub get gateway,httproute
+```
+
+After adding `masterhub.ndomi.local` to `/etc/hosts`, test the application:
+
+```bash
+curl -k --resolve masterhub.ndomi.local:443:192.168.1.240 \
+   https://masterhub.ndomi.local/
+```
+
+To deploy a new container version, update the image tag in the corresponding
+Deployment manifest and reapply the Kustomization. To roll back a Deployment:
+
+```bash
+kubectl -n masterhub rollout undo deployment/masterhub-frontend
+kubectl -n masterhub rollout undo deployment/masterhub-backend
 ```
 
 ## Architecture
@@ -66,7 +121,8 @@ vault/                            Vault chart values, bootstrap, and sync resour
 - Argo CD is available at `https://argocd.ndomi.local`.
 - Vault is available at `https://vault.ndomi.local`.
 - Prometheus is available at `https://prometheus.ndomi.local`.
-- Argo CD, Vault, and Prometheus share the Traefik IP and are routed by hostname.
+- Grafana is available at `https://grafana.ndomi.local`.
+- Argo CD, Vault, Prometheus, and Grafana share the Traefik IP and are routed by hostname.
 - Vault stores the wildcard certificate at `secret/ndomi-local-wildcard`.
 - External Secrets Operator synchronizes that certificate into namespace-local Secrets:
    - `argocd/argocd-tls`
@@ -185,7 +241,8 @@ The local certificate and private key are intentionally not stored in this repos
 secret/ndomi-local-wildcard
 ```
 
-The certificate should cover `*.ndomi.local`, including `argocd.ndomi.local` and `vault.ndomi.local`.
+The certificate should cover `*.ndomi.local`, including `argocd.ndomi.local`,
+`vault.ndomi.local`, and `masterhub.ndomi.local`.
 
 ## External Secrets Operator
 
@@ -224,6 +281,8 @@ kubectl -n argocd annotate externalsecret argocd-tls \
    force-sync="$(date +%s)" --overwrite
 kubectl -n vault annotate externalsecret vault-tls \
    force-sync="$(date +%s)" --overwrite
+kubectl -n monitoring annotate externalsecret prometheus-tls grafana-tls \
+   force-sync="$(date +%s)" --overwrite
 ```
 
 Verify:
@@ -240,7 +299,7 @@ kubectl -n monitoring get externalsecret,secret grafana-tls
 Add the Gateway IP to `/etc/hosts`:
 
 ```text
-192.168.1.240 argocd.ndomi.local vault.ndomi.local prometheus.ndomi.local grafana.ndomi.local
+192.168.1.240 argocd.ndomi.local vault.ndomi.local prometheus.ndomi.local grafana.ndomi.local masterhub.ndomi.local
 ```
 
 Test both routes:
@@ -346,15 +405,16 @@ kubectl -n traefik get svc -o wide
 kubectl -n metallb-system get svc -o wide
 ```
 
-Expose the Argo-managed Prometheus UI through Gateway API:
+Expose the Argo-managed Prometheus and Grafana UIs through Gateway API:
 
 ```bash
-kubectl apply -k monitoring
+kubectl apply -k infrastructure/monitoring
 ```
 
-The monitoring Kustomization creates a namespace-local TLS Secret from Vault
-and routes `prometheus.ndomi.local` to
-`prometheus-kube-prometheus-prometheus:9090`.
+The monitoring Kustomization creates namespace-local TLS Secrets from Vault and
+routes `prometheus.ndomi.local` to
+`prometheus-kube-prometheus-prometheus:9090` and `grafana.ndomi.local` to the
+Grafana Service.
 
 ## GitOps with Argo CD
 
