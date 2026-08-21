@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ndomi/masterhub-backend:latest
+          image: ndomi/mastershub-backend:latest
           ports:
             - containerPort: 8080
           resources:
