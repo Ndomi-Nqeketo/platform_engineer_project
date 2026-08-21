@@ -5,3 +5,13 @@ resources:
   - gateway.yaml
   - httproute.yaml
   - tls-sync.yaml
+  - crds/alertmanagerconfigs.yaml
+  - crds/alertmanagers.yaml
+  - crds/prometheusagents.yaml
+  - crds/prometheuses.yaml
+  - crds/prometheusrules.yaml
+  - crds/scrapeconfigs.yaml
+  - crds/servicemonitors.yaml
+  - crds/podmonitors.yaml
+  - crds/probes.yaml
+  - crds/thanosrulers.yaml
