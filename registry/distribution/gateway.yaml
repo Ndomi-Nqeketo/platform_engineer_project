@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: distribution-gateway
+  namespace: distribution
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: websecure
+      port: 443
+      protocol: HTTPS
+      hostname: distribution.ndomi.local
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: distribution-tls
+      allowedRoutes:
+        namespaces:
+          from: Same

@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: distribution
+  namespace: argocd
+spec:
+  project: default
+  
+  sources:
+    - repoURL: oci://ghcr.io/quenchworks/charts
+      chart: distribution
+      targetRevision: 0.0.9
+      helm:
+        releaseName: distribution
+        valueFiles:
+          - $values/infrastructure/argocd/base/distribution/distribution-values.yaml
+    
+    - repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+      targetRevision: masters
+      ref: values
+      
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: distribution
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
