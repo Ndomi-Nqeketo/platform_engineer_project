@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-frontend
+  namespace: masterhub
+spec:
+  selector:
+    app: masterhub-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

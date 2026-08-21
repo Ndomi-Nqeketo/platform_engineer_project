@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: masterhub-frontend
+  namespace: masterhub
+  labels:
+    app: masterhub-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: masterhub-frontend
+  template:
+    metadata:
+      labels:
+        app: masterhub-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ndomi/masterhub-frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"

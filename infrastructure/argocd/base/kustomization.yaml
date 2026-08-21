@@ -12,6 +12,7 @@ resources:
   - platform
   - vault/application.yaml
   - prometheus-crds
+  - masterhub
 
 patches:
   - target:
