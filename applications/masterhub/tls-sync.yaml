@@ -1,0 +1,24 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: tls-sync
+  namespace: masterhub
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: masterhub-tls
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/tls
+  data:
+    - secretKey: tls.crt
+      remoteRef:
+        key: ndomi-local-wildcard
+        property: tls.crt
+    - secretKey: tls.key
+      remoteRef:
+        key: ndomi-local-wildcard
+        property: tls.key
