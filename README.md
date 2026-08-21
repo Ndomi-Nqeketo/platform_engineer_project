@@ -1,6 +1,63 @@
-# platform_engineer_project
+# Platform Engineer Project
 
-This project demonstrates a local platform engineering stack built on Kubernetes.
+This repository defines a local Kubernetes platform managed with Helm, Kustomize,
+and Argo CD. It combines MetalLB, Traefik Gateway API, Argo CD, HashiCorp Vault,
+External Secrets Operator, Prometheus, and Grafana.
+
+The manifests target a development cluster. They are not a production Vault,
+certificate-management, or high-availability design.
+
+## Prerequisites
+
+Install and configure the following before starting:
+
+- A running Kubernetes cluster with `kubectl` configured for the target context.
+- Helm 3, Kustomize support through `kubectl`, and the `argocd` CLI.
+- `jq`, required by `vault/bootstrap.sh`.
+- The Vault CLI, required for the optional human-login setup.
+- An unused private LAN address range for MetalLB.
+- A wildcard certificate and private key covering `*.ndomi.local`.
+
+The bootstrap script expects `CERT_FILE` and `KEY_FILE` to point to PEM files.
+It also uses `kubectl create token`, so the cluster must support projected service
+account tokens.
+
+## Installation Order
+
+Run the components in this order because later resources depend on the earlier
+ones:
+
+1. Install MetalLB and reserve its address range.
+2. Install Traefik with Gateway API enabled.
+3. Install Argo CD and wait for its control plane to become available.
+4. Sync the `local-path` Argo CD Application and verify its StorageClass.
+5. Install Vault and wait for its StatefulSet to be running.
+6. Install External Secrets Operator if it is not already installed.
+7. Run `vault/bootstrap.sh` to initialize Vault and create the sync resources.
+8. Confirm the ExternalSecrets and TLS Secrets are ready.
+
+The bootstrap script applies the Vault Gateway, Vault authentication resources,
+and monitoring resources after configuring Vault.
+
+Apply the Argo CD development overlay with:
+
+```bash
+kubectl apply --server-side -k infrastructure/argocd/overlays/dev
+```
+
+The production overlay is present at `infrastructure/argocd/overlays/production`,
+but should be reviewed and adapted before use.
+
+## Repository Layout
+
+```text
+infrastructure/argocd/base/       Argo CD Applications and base resources
+infrastructure/argocd/overlays/  Environment-specific Argo CD entry points
+infrastructure/monitoring/       Prometheus and Grafana Gateway resources
+metallb/                          MetalLB chart values and address pool
+traefik/                          Traefik chart values
+vault/                            Vault chart values, bootstrap, and sync resources
+```
 
 ## Architecture
 
@@ -93,23 +150,32 @@ helm upgrade vault hashicorp/vault \
    -f vault/values.yaml
 ```
 
-After the StatefulSet is ready, run the bootstrap script. It initializes and
+After the StatefulSet is running, run the bootstrap script. It initializes and
 unseals Vault on first provisioning, or reuses an existing initialized Vault:
 
 ```bash
 export CERT_FILE=/path/to/cert.pem
 export KEY_FILE=/path/to/key.pem
-bash vault/bootstrap.sh
+bash ./vault/bootstrap.sh
 ```
 
-The script creates `vault-init.json` locally on first initialization. It
-contains the unseal key and root token; protect it and remove it from the
-working directory after securely storing the recovery information.
+The script creates `vault-init.json` in the current working directory on first
+initialization. It contains the unseal key and root token; protect it and remove
+it from the working directory after securely storing the recovery information.
 
 If Vault is recreated, do not wait for the readiness condition before running
 bootstrap: an uninitialized Vault is Running but not Ready. The bootstrap
 script waits for pod phase `Running`, initializes/unseals Vault, enables KV v2,
 and configures Kubernetes auth.
+
+To create the optional non-root Vault UI login during bootstrap, set
+`VAULT_USER_PASSWORD` before running the script:
+
+```bash
+export VAULT_USER_PASSWORD='choose-a-strong-password'
+bash ./vault/bootstrap.sh
+unset VAULT_USER_PASSWORD
+```
 
 ## Certificate Storage
 
@@ -174,7 +240,7 @@ kubectl -n monitoring get externalsecret,secret grafana-tls
 Add the Gateway IP to `/etc/hosts`:
 
 ```text
-192.168.1.240 argocd.ndomi.local vault.ndomi.local prometheus.ndomi.local
+192.168.1.240 argocd.ndomi.local vault.ndomi.local prometheus.ndomi.local grafana.ndomi.local
 ```
 
 Test both routes:
@@ -184,9 +250,32 @@ curl -k --resolve argocd.ndomi.local:443:192.168.1.240 \
    https://argocd.ndomi.local
 curl -k --resolve vault.ndomi.local:443:192.168.1.240 \
    https://vault.ndomi.local/v1/sys/health
+curl -k --resolve prometheus.ndomi.local:443:192.168.1.240 \
+   https://prometheus.ndomi.local/-/ready
+curl -k --resolve grafana.ndomi.local:443:192.168.1.240 \
+   https://grafana.ndomi.local/api/health
 ```
 
 The `-k` flag is only needed when the local `mkcert` CA is not trusted by the client.
+
+## Verification Checklist
+
+Use these checks after installation:
+
+```bash
+kubectl get nodes
+kubectl get gateway -A
+kubectl get httproute -A
+kubectl get applications -n argocd
+kubectl get externalsecret -A
+kubectl get secret -A | grep -E '(argocd-tls|vault-tls|prometheus-tls|grafana-tls)'
+argocd app list
+```
+
+An Argo CD Application should report `Synced` and `Healthy`. Each ExternalSecret
+should report `SecretSynced`; a missing TLS Secret usually means Vault is sealed,
+the Kubernetes auth role is incorrect, or the External Secrets controller has
+not been restarted after its installation.
 
 ## Grafana
 
