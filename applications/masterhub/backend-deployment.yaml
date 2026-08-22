@@ -15,6 +15,8 @@ spec:
       labels:
         app: masterhub-backend
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
       containers:
         - name: backend
           image: ndomi/mastershub-backend:v1.0.1
