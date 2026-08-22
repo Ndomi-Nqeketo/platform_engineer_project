@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: masterhub-gateway
   hostnames:
-    - masterhub.ndomi.local
+    - masterhub.masterssoccer.co.za
   rules:
     - matches:
         - path:

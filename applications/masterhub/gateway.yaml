@@ -9,7 +9,7 @@ spec:
     - name: websecure
       protocol: HTTPS
       port: 443
-      hostname: masterhub.ndomi.local
+      hostname: masterhub.masterssoccer.co.za
       tls:
         mode: Terminate
         certificateRefs:
