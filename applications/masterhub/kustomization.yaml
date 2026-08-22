@@ -11,3 +11,4 @@ resources:
   - tls-sync.yaml
   - secret-store.yaml
   - vault-auth.yaml
+  - dockerhub-secret.yaml
