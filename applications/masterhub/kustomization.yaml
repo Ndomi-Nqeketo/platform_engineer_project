@@ -12,3 +12,4 @@ resources:
   - secret-store.yaml
   - vault-auth.yaml
   - dockerhub-secret.yaml
+  - minio-external-secret.yaml

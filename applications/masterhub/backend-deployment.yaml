@@ -25,6 +25,17 @@ spec:
           envFrom:
             - secretRef:
                 name: masterhub-postgres
+            - secretRef:
+                name: masterhub-minio
+          env:
+            - name: MINIO_ENDPOINT
+              value: minio.minio.svc.cluster.local
+            - name: MINIO_PORT
+              value: "9000"
+            - name: MINIO_BUCKET
+              value: masterhub
+            - name: MINIO_USE_SSL
+              value: "false"
           
           ports:
             - containerPort: 8080
