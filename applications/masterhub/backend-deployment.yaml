@@ -19,7 +19,8 @@ spec:
         - name: dockerhub-secret
       containers:
         - name: backend
-          image: ndomi/mastershub-backend:v1.0.1
+          image: ndomi/mastershub-backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           resources:
