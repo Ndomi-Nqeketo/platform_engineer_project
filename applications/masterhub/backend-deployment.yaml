@@ -21,6 +21,11 @@ spec:
         - name: backend
           image: ndomi/mastershub-backend:latest
           imagePullPolicy: Always
+          
+          envFrom:
+            - secretRef:
+                name: masterhub-secrets
+          
           ports:
             - containerPort: 8080
           resources:
