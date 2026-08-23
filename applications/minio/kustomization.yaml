@@ -8,4 +8,4 @@ resources:
   - service.yaml
   - external-secret.yaml
   - vault-secret-store.yaml
-  - external-secret-role.yaml
+  - nfs-storageclass.yaml
