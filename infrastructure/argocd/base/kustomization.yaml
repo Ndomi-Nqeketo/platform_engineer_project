@@ -13,6 +13,7 @@ resources:
   - vault/application.yaml
   - prometheus-crds
   - masterhub
+  - database
 
 patches:
   - target:
