@@ -24,7 +24,7 @@ spec:
           
           envFrom:
             - secretRef:
-                name: masterhub-secrets
+                name: masterhub-postgres
           
           ports:
             - containerPort: 8080
