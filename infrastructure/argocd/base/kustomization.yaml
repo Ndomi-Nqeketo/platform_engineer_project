@@ -15,6 +15,7 @@ resources:
   - masterhub
   - database
   - minio
+  - nfs-csi
 
 patches:
   - target:
