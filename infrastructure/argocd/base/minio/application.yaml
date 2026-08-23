@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+    targetRevision: masters
+    path: applications/minio
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

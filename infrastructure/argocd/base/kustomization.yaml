@@ -14,6 +14,7 @@ resources:
   - prometheus-crds
   - masterhub
   - database
+  - minio
 
 patches:
   - target:
