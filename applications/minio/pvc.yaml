@@ -5,8 +5,8 @@ metadata:
   namespace: minio
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: openebs-hostpath
+    - ReadWriteMany
+  storageClassName: minio-nfs
   resources:
     requests:
       storage: 20Gi
