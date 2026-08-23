@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: masterhub
+  namespace: argocd
+spec:
+  project: default
+  
+  source:
+    repoURL: https://github.com/Ndomi-Nqeketo/platform_engineer_project.git
+    targetRevision: masters
+    path: database
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: masterhub
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
