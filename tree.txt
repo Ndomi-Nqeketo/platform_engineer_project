@@ -1,0 +1,107 @@
+.
+├── README.md
+├── applications
+│   ├── database
+│   │   ├── external-secrets.yaml
+│   │   └── kustomization.yaml
+│   └── masterhub
+│       ├── backend-deployment.yaml
+│       ├── backend-service.yaml
+│       ├── dockerhub-secret.yaml
+│       ├── frontend-deployment.yaml
+│       ├── frontend-service.yaml
+│       ├── gateway.yaml
+│       ├── httproute.yaml
+│       ├── kustomization.yaml
+│       ├── secret-store.yaml
+│       ├── tls-sync.yaml
+│       └── vault-auth.yaml
+├── infrastructure
+│   ├── argocd
+│   │   ├── base
+│   │   │   ├── argocd
+│   │   │   │   ├── argocd-servicemonitor.yaml
+│   │   │   │   ├── gateway.yaml
+│   │   │   │   ├── gatewayclass.yaml
+│   │   │   │   ├── httproute.yaml
+│   │   │   │   ├── kustomization.yaml
+│   │   │   │   └── namespace.yaml
+│   │   │   ├── database
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── grafana
+│   │   │   │   ├── grafana-application.yaml
+│   │   │   │   ├── grafana-values.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── kustomization.yaml
+│   │   │   ├── local-path
+│   │   │   │   ├── kustomization.yaml
+│   │   │   │   └── local-path-application.yaml
+│   │   │   ├── masterhub
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── openebs
+│   │   │   │   ├── kustomization.yaml
+│   │   │   │   ├── openebs-application.yaml
+│   │   │   │   └── openebs-values.yaml
+│   │   │   ├── platform
+│   │   │   │   ├── kustomization.yaml
+│   │   │   │   └── platform-application.yaml
+│   │   │   ├── prometheus
+│   │   │   │   ├── kustomization.yaml
+│   │   │   │   ├── prometheus-application.yaml
+│   │   │   │   └── prometheus-values.yaml
+│   │   │   ├── prometheus-crds
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   └── vault
+│   │   │       ├── application.yaml
+│   │   │       ├── kustomization.yaml
+│   │   │       └── rbac.yaml
+│   │   └── overlays
+│   │       ├── dev
+│   │       │   └── kustomization.yaml
+│   │       └── production
+│   │           └── kustomization.yaml
+│   └── monitoring
+│       ├── grafana
+│       │   ├── external-secret.yaml
+│       │   ├── gateway.yaml
+│       │   ├── httproute.yaml
+│       │   ├── kustomization.yaml
+│       │   └── tls-sync.yaml
+│       ├── kustomization.yaml
+│       ├── prometheus
+│       │   ├── crds
+│       │   │   ├── alertmanagerconfigs.yaml
+│       │   │   ├── alertmanagers.yaml
+│       │   │   ├── podmonitors.yaml
+│       │   │   ├── probes.yaml
+│       │   │   ├── prometheusagents.yaml
+│       │   │   ├── prometheuses.yaml
+│       │   │   ├── prometheusrules.yaml
+│       │   │   ├── scrapeconfigs.yaml
+│       │   │   ├── servicemonitors.yaml
+│       │   │   └── thanosrulers.yaml
+│       │   ├── gateway.yaml
+│       │   ├── httproute.yaml
+│       │   ├── kustomization.yaml
+│       │   └── tls-sync.yaml
+│       └── tls-sync.yaml
+├── metallb
+│   ├── ipaddresspool.yaml
+│   └── values.yaml
+├── traefik
+│   └── values.yaml
+├── tree.txt
+├── vault
+│   ├── argocd-secret-sync.yaml
+│   ├── bootstrap.sh
+│   ├── gateway.yaml
+│   ├── httproute.yaml
+│   ├── kustomization.yaml
+│   ├── values.yaml
+│   └── vault-init.json
+└── vault-init.json
+
+27 directories, 78 files
