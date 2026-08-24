@@ -8,7 +8,7 @@ resources:
   - frontend-service.yaml
   - gateway.yaml
   - httproute.yaml
-  - tls-sync.yaml
+#  - tls-sync.yaml
   - secret-store.yaml
   - vault-auth.yaml
   - dockerhub-secret.yaml
