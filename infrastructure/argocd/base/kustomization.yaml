@@ -16,6 +16,7 @@ resources:
   - database
   - minio
   - nfs-csi
+  - cert-manager
 
 patches:
   - target:
