@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: ndomeleze.nqeketo@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account-key
+    
+    solvers:
+      - selector:
+          dnsZones:
+            - masterssoccer.co.za
+        dns01:
+          webhook:
+            groupName: acme.masterssoccer.co.za
+            solverName: godaddy
+            config:
+              apiKeySecretRef:
+                name: godaddy-api-key
+                key: token
+              production: true
+              ttl: 600
