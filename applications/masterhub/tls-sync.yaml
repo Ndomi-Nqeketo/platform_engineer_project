@@ -16,9 +16,9 @@ spec:
   data:
     - secretKey: tls.crt
       remoteRef:
-        key: ndomi-local-wildcard
+        key: masterssoccer-wildcard
         property: tls.crt
     - secretKey: tls.key
       remoteRef:
-        key: ndomi-local-wildcard
+        key: masterssoccer-wildcard
         property: tls.key
