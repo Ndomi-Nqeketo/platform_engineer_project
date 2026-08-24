@@ -4,18 +4,29 @@
 │   ├── database
 │   │   ├── external-secrets.yaml
 │   │   └── kustomization.yaml
-│   └── masterhub
-│       ├── backend-deployment.yaml
-│       ├── backend-service.yaml
-│       ├── dockerhub-secret.yaml
-│       ├── frontend-deployment.yaml
-│       ├── frontend-service.yaml
-│       ├── gateway.yaml
-│       ├── httproute.yaml
+│   ├── masterhub
+│   │   ├── backend-deployment.yaml
+│   │   ├── backend-service.yaml
+│   │   ├── dockerhub-secret.yaml
+│   │   ├── frontend-deployment.yaml
+│   │   ├── frontend-service.yaml
+│   │   ├── gateway.yaml
+│   │   ├── httproute.yaml
+│   │   ├── kustomization.yaml
+│   │   ├── minio-external-secret.yaml
+│   │   ├── secret-store.yaml
+│   │   ├── tls-sync.yaml
+│   │   └── vault-auth.yaml
+│   └── minio
+│       ├── deployment.yaml
+│       ├── external-secret.yaml
 │       ├── kustomization.yaml
-│       ├── secret-store.yaml
-│       ├── tls-sync.yaml
-│       └── vault-auth.yaml
+│       ├── namespace.yaml
+│       ├── nfs-storageclass.yaml
+│       ├── pvc.yaml
+│       ├── service.yaml
+│       └── vault-secret-store.yaml
+├── cert.pem
 ├── infrastructure
 │   ├── argocd
 │   │   ├── base
@@ -26,7 +37,15 @@
 │   │   │   │   ├── httproute.yaml
 │   │   │   │   ├── kustomization.yaml
 │   │   │   │   └── namespace.yaml
+│   │   │   ├── cert-manager
+│   │   │   │   ├── application.yaml
+│   │   │   │   ├── cert-issuer.yaml
+│   │   │   │   ├── certificate.yaml
+│   │   │   │   └── kustomization.yaml
 │   │   │   ├── database
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── godaddy-webhook
 │   │   │   │   ├── application.yaml
 │   │   │   │   └── kustomization.yaml
 │   │   │   ├── grafana
@@ -38,6 +57,12 @@
 │   │   │   │   ├── kustomization.yaml
 │   │   │   │   └── local-path-application.yaml
 │   │   │   ├── masterhub
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── minio
+│   │   │   │   ├── application.yaml
+│   │   │   │   └── kustomization.yaml
+│   │   │   ├── nfs-csi
 │   │   │   │   ├── application.yaml
 │   │   │   │   └── kustomization.yaml
 │   │   │   ├── openebs
@@ -88,6 +113,9 @@
 │       │   ├── kustomization.yaml
 │       │   └── tls-sync.yaml
 │       └── tls-sync.yaml
+├── key.pem
+├── masterssoccer-wildcard-cert.pem
+├── masterssoccer-wildcard-key.pem
 ├── metallb
 │   ├── ipaddresspool.yaml
 │   └── values.yaml
@@ -104,4 +132,4 @@
 │   └── vault-init.json
 └── vault-init.json
 
-27 directories, 78 files
+32 directories, 101 files
