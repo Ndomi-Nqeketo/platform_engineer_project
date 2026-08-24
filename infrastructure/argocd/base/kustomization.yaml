@@ -17,6 +17,7 @@ resources:
   - minio
   - nfs-csi
   - cert-manager
+  - godaddy-webhook
 
 patches:
   - target:
