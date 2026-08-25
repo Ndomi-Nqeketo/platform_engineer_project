@@ -3,5 +3,4 @@ kind: Kustomization
 
 resources:
   - application.yaml
-  - ../../../../applications/postgres-exporter/external-secret.yaml
   - external-secret-application.yaml
