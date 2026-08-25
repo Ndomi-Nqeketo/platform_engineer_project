@@ -18,6 +18,7 @@ resources:
   - nfs-csi
   - cert-manager
   - godaddy-webhook
+  - postgres-exporter
 
 patches:
   - target:
