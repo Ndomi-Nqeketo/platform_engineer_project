@@ -206,6 +206,32 @@ helm upgrade vault hashicorp/vault \
    -f vault/values.yaml
 ```
 
+### Proxmox Extra Disk Troubleshooting
+
+If you add an extra disk to a Proxmox node or VM and it does not appear in the
+Proxmox UI, verify host-level detection first:
+
+```bash
+lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT,MODEL
+fdisk -l
+dmesg | grep -Ei 'sd|nvme|ata|scsi|error' | tail -100
+```
+
+- If the disk appears in `lsblk` or `fdisk`, add it as storage in Proxmox:
+  **Datacenter -> Storage -> Add** and choose `Directory`, `LVM-Thin`, or `ZFS`
+  based on your target use.
+- If the disk does not appear there, this is outside Proxmox storage config:
+  check disk attachment, power, controller visibility, passthrough, and BIOS/UEFI
+  detection.
+
+For this repository, confirm your Kubernetes node still has a working dynamic
+provisioner after any storage changes:
+
+```bash
+argocd app sync local-path
+kubectl get storageclass local-path
+```
+
 After the StatefulSet is running, run the bootstrap script. It initializes and
 unseals Vault on first provisioning, or reuses an existing initialized Vault:
 

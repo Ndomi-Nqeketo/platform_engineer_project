@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres-exporter
+  namespace: argocd
+spec:
+  project: default
+  
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: prometheus-postgres-exporter
+    targetRevision: 8.2.0
+    helm:
+      releaseName: postgres-exporter
+      values: |
+        config:
+          datasource:
+            host: 192.168.1.50
+            port: "5432"
+            database: masterhub
+            user: masterhub_app
+            passwordSecret:
+              name: postgres-exporter
+              key: password
+            sslmode: require
+        
+        serviceMonitor:
+          enabled: true
+          namespace: monitoring
+          labels:
+            release: prometheus
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
