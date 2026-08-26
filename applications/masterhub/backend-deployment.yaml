@@ -15,6 +15,14 @@ spec:
       labels:
         app: masterhub-backend
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: masterhub-backend
+              
       imagePullSecrets:
         - name: dockerhub-secret
       containers:
