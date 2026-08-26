@@ -12,6 +12,7 @@ spec:
     kustomize:
       patches:
         - target:
+            version: v1
             kind: Namespace
             name: local-path-storage
           patch: |-
