@@ -19,6 +19,7 @@ resources:
   - cert-manager
   - godaddy-webhook
   - postgres-exporter
+  - descheduler
 
 patches:
   - target:
