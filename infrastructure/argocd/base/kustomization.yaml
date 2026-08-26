@@ -89,4 +89,15 @@ patches:
         name: applicationsets.argoproj.io
         annotations:
           argocd.argoproj.io/sync-options: Replace=true
+  - target:
+      kind: ConfigMap
+      name: argocd-rbac-cm
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: argocd-rbac-cm
+      data:
+        policy.csv: |
+          g, admin, role:admin
           
