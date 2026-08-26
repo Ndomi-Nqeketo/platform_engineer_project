@@ -14,25 +14,41 @@ spec:
       releaseName: descheduler
       values: |
         deschedulerPolicy:
-          strategies:
-            LowNodeUtilization:
-              enabled: true
-              params:
-                nodeResourceUtilizationThresholds:
-                  thresholds:
-                    cpu: 15
-                    memory: 15
-                    pods: 20
-                  targetThresholds:
-                    cpu: 40
-                    memory: 40
-                    pods: 50
+          profiles:
+            - name: default
         
-            RemovePodsViolatingInterPodAntiAffinity:
-              enabled: true
+              pluginConfig:
+                - name: DefaultEvictor
+                  args:
+                    nodeFit: true
         
-            RemovePodsViolatingNodeAffinity:
-              enabled: true
+                - name: RemovePodsViolatingNodeAffinity
+                  args:
+                    nodeAffinityType:
+                      - requiredDuringSchedulingIgnoredDuringExecution
+        
+                - name: RemovePodsViolatingInterPodAntiAffinity
+        
+                - name: LowNodeUtilization
+                  args:
+                    thresholds:
+                      cpu: 15
+                      memory: 15
+                      pods: 20
+                    targetThresholds:
+                      cpu: 40
+                      memory: 40
+                      pods: 50
+        
+              plugins:
+                balance:
+                  enabled:
+                    - LowNodeUtilization
+        
+                deschedule:
+                  enabled:
+                    - RemovePodsViolatingNodeAffinity
+                    - RemovePodsViolatingInterPodAntiAffinity
   
   destination:
     server: https://kubernetes.default.svc
