@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-recovery-old
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+  
+  nfs:
+    server: 192.168.1.50
+    path: /srv/minio/pvc-25c50b30-9c4b-4da0-9a53-424b502dafc4
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-recovery-old
+  namespace: minio
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: minio-recovery-old
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-recovery
+  namespace: minio
+spec:
+  replicas: 1
+  
+  selector:
+    matchLabels:
+      app: minio-recovery
+  
+  template:
+    metadata:
+      labels:
+        app: minio-recovery
+    
+    spec:
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:latest
+          
+          args:
+            - server
+            - /data
+            - --console-address
+            - :9001
+          
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-root
+                  key: username
+            
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-root
+                  key: password
+          
+          ports:
+            - name: api
+              containerPort: 9000
+            
+            - name: console
+              containerPort: 9001
+          
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-recovery-old
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-recovery
+  namespace: minio
+spec:
+  selector:
+    app: minio-recovery
+  
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    
+    - name: console
+      port: 9001
+      targetPort: 9001

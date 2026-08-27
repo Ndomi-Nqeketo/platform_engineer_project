@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-data-static
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: minio-static
+  volumeMode: Filesystem
+  
+  mountOptions:
+    - nfsvers=4.1
+  
+  csi:
+    driver: nfs.csi.k8s.io
+    
+    volumeHandle: "192.168.1.50#/srv/minio/pvc-23ba6243-0b8f-4ce0-8b8a-7d8a05255c1c##"
+    volumeAttributes:
+      server: 192.168.1.50
+      share: /srv/minio/pvc-23ba6243-0b8f-4ce0-8b8a-7d8a05255c1c

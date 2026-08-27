@@ -9,3 +9,4 @@ resources:
   - external-secret.yaml
   - vault-secret-store.yaml
   - nfs-storageclass.yaml
+  - pv.yaml
