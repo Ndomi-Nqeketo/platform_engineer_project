@@ -11,7 +11,7 @@ kubeProxy:
   enabled: false
 
 nodeExporter:
-  enabled: false
+  enabled: true
 
 grafana:
   enabled: false
