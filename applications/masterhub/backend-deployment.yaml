@@ -27,7 +27,7 @@ spec:
         - name: dockerhub-secret
       containers:
         - name: backend
-          image: ndomi/mastershub-backend:latest
+          image: ndomi/mastershub-backend:test
           imagePullPolicy: Always
           
           envFrom:
