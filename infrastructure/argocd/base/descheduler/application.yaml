@@ -13,7 +13,13 @@ spec:
     helm:
       releaseName: descheduler
       values: |
+        # CronJob mode: this is what actually controls run frequency (deschedulingInterval is ignored)
+        schedule: "*/10 * * * *"
+
         deschedulerPolicy:
+          maxNoOfPodsToEvictPerNode: 1
+          maxNoOfPodsToEvictTotal: 5
+
           profiles:
             - name: default
         
@@ -21,6 +27,7 @@ spec:
                 - name: DefaultEvictor
                   args:
                     nodeFit: true
+                    minPodAge: 10m
         
                 - name: RemovePodsViolatingNodeAffinity
                   args:
@@ -31,14 +38,19 @@ spec:
         
                 - name: LowNodeUtilization
                   args:
+                    # wider gap = harder to trigger, fewer/less sensitive evictions
                     thresholds:
-                      cpu: 15
-                      memory: 15
-                      pods: 20
+                      cpu: 10
+                      memory: 10
+                      pods: 10
                     targetThresholds:
-                      cpu: 40
-                      memory: 40
-                      pods: 50
+                      cpu: 60
+                      memory: 60
+                      pods: 60
+                    # masterhub-frontend keeps bouncing back onto the "underutilized" node; stop evicting it
+                    evictableNamespaces:
+                      exclude:
+                        - masterhub
         
               plugins:
                 balance:
